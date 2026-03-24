@@ -1,0 +1,20 @@
+# Build output
+dist/
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Turbo cache
+.turbo/
+
+# Lock files
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Generated / binary
+*.min.js
+*.min.css
+coverage/
