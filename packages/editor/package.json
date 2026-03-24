@@ -1,49 +1,46 @@
 {
-  "name": "@bix/editor",
-  "version": "0.0.1",
-  "private": true,
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+    "name": "@bix/editor",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "build": "tsc --build",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "typecheck": "tsc --noEmit"
+    },
+    "peerDependencies": {
+        "@bix/engine": "*",
+        "react": ">=18.0.0",
+        "react-dom": ">=18.0.0"
+    },
+    "dependencies": {
+        "@react-three/drei": "^9.117.0",
+        "@react-three/fiber": "^8.17.0",
+        "lucide-react": "^0.460.0",
+        "tailwindcss": "^3.4.0",
+        "three": "^0.170.0",
+        "zustand": "^5.0.0"
+    },
+    "devDependencies": {
+        "@bix/engine": "*",
+        "@testing-library/dom": "^10.4.0",
+        "@testing-library/jest-dom": "^6.6.0",
+        "@testing-library/react": "^16.0.0",
+        "@testing-library/user-event": "^14.5.0",
+        "@types/react": "^18.3.0",
+        "@types/react-dom": "^18.3.0",
+        "@types/three": "^0.170.0",
+        "@vitejs/plugin-react": "^4.3.0",
+        "jsdom": "^25.0.0",
+        "react": "^18.3.0",
+        "react-dom": "^18.3.0",
+        "typescript": "^5.7.0",
+        "vitest": "^3.0.0"
     }
-  },
-  "scripts": {
-    "build": "tsc --build",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "peerDependencies": {
-    "@bix/engine": "*",
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
-  },
-  "dependencies": {
-    "@react-three/drei": "^9.117.0",
-    "@react-three/fiber": "^8.17.0",
-    "lucide-react": "^0.460.0",
-    "tailwindcss": "^3.4.0",
-    "three": "^0.170.0",
-    "zustand": "^5.0.0"
-  },
-  "devDependencies": {
-    "@bix/engine": "*",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.0",
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "@types/three": "^0.170.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "jsdom": "^25.0.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.0.0"
-  }
 }

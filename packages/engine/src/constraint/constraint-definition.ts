@@ -1,5 +1,33 @@
 import { type Intent, type IntentInput } from "../intent/intent.js"
 import { type WorldQuery } from "../world/world.js"
+import { type Entity } from "../entity/entity.js"
+
+// ── WorldReadonlyView ─────────────────────────────────────────────
+
+/**
+ * Read-only view of the World provided to constraint evaluate functions.
+ *
+ * These are the convenience methods promised by the schema-authoring
+ * skill: ctx.world.getParent(id), ctx.world.getTrait(id, name), etc.
+ * Avoids the need for constraints to manually traverse entity.parent/
+ * entity.children arrays with byId lookups.
+ */
+export interface WorldReadonlyView {
+    /** Get an entity by ID. Same as ctx.entities.byId(id). */
+    getEntity(id: string): Entity | undefined
+    /**
+     * Get the parent entity of an entity.
+     * Equivalent to: ctx.entities.byId(ctx.entities.byId(id)?.parent).
+     */
+    getParent(id: string): Entity | undefined
+    /** Get all direct children of an entity. */
+    getChildren(id: string): readonly Entity[]
+    /**
+     * Get the data for a specific trait on an entity.
+     * Returns undefined if the entity doesn't exist or the trait isn't attached.
+     */
+    getTrait(id: string, traitName: string): unknown
+}
 
 // ── Violation ────────────────────────────────────────────────────
 
@@ -9,14 +37,14 @@ import { type WorldQuery } from "../world/world.js"
  * and subscribers.
  */
 export interface Violation {
-  /** Name of the constraint that generated this violation. */
-  constraintName: string
-  /** Human + AI readable explanation of why the rule was violated. */
-  message: string
-  /** Entity IDs directly involved in the violation. */
-  entityIds: string[]
-  /** The effect class — matches the ConstraintDefinition.effect. */
-  effect: ConstraintEffect
+    /** Name of the constraint that generated this violation. */
+    constraintName: string
+    /** Human + AI readable explanation of why the rule was violated. */
+    message: string
+    /** Entity IDs directly involved in the violation. */
+    entityIds: string[]
+    /** The effect class — matches the ConstraintDefinition.effect. */
+    effect: ConstraintEffect
 }
 
 // ── ConstraintResult ─────────────────────────────────────────────
@@ -30,14 +58,14 @@ export interface Violation {
  *   (used for "adjust" and "enforce" effects).
  */
 export interface ConstraintResult {
-  valid: boolean
-  /** Populated when valid is false. May be empty even when valid is false (no-op violation). */
-  violations: Violation[]
-  /**
-   * Suggested follow-up intents to bring the world into compliance.
-   * Only honoured when effect is "adjust" or "enforce".
-   */
-  suggestions?: IntentInput[]
+    valid: boolean
+    /** Populated when valid is false. May be empty even when valid is false (no-op violation). */
+    violations: Violation[]
+    /**
+     * Suggested follow-up intents to bring the world into compliance.
+     * Only honoured when effect is "adjust" or "enforce".
+     */
+    suggestions?: IntentInput[]
 }
 
 // ── ConstraintContext ─────────────────────────────────────────────
@@ -50,18 +78,23 @@ export interface ConstraintResult {
  * The ConstraintSolver handles enforcement based on the effect.
  */
 export interface ConstraintContext {
-  /** Read-only queries into the World's current entity state. */
-  readonly entities: WorldQuery
-  /** What triggered this re-evaluation. */
-  readonly trigger: {
-    /** The pending intent (not yet executed when pre-execution evaluation runs). */
-    readonly intent: Intent
+    /** Read-only queries into the World's current entity state. */
+    readonly entities: WorldQuery
     /**
-     * Entity IDs directly touched by the triggering intent.
-     * Best-effort — may be empty for complex or unknown intent types.
+     * Convenience accessors matching the schema-authoring skill's documented API.
+     * Use these instead of manual entity.parent / entity.children traversal.
      */
-    readonly affectedEntityIds: readonly string[]
-  }
+    readonly world: WorldReadonlyView
+    /** What triggered this re-evaluation. */
+    readonly trigger: {
+        /** The pending intent (not yet executed when pre-execution evaluation runs). */
+        readonly intent: Intent
+        /**
+         * Entity IDs directly touched by the triggering intent.
+         * Best-effort — may be empty for complex or unknown intent types.
+         */
+        readonly affectedEntityIds: readonly string[]
+    }
 }
 
 // ── Effect ───────────────────────────────────────────────────────
@@ -79,12 +112,12 @@ export type ConstraintEffect = "prevent" | "warn" | "adjust" | "enforce"
  * explicit watch declarations for performance).
  */
 export interface ConstraintWatch {
-  /** Re-evaluate when entities of these types are involved. */
-  entityTypes?: readonly string[]
-  /** Re-evaluate when these trait names are set or removed. */
-  traitNames?: readonly string[]
-  /** Re-evaluate when these specific intent types are dispatched. */
-  intentTypes?: readonly string[]
+    /** Re-evaluate when entities of these types are involved. */
+    entityTypes?: readonly string[]
+    /** Re-evaluate when these trait names are set or removed. */
+    traitNames?: readonly string[]
+    /** Re-evaluate when these specific intent types are dispatched. */
+    intentTypes?: readonly string[]
 }
 
 // ── ConstraintDefinition ─────────────────────────────────────────
@@ -108,35 +141,35 @@ export interface ConstraintWatch {
  *   (always brings state into compliance, never just warns).
  */
 export interface ConstraintDefinition {
-  /** Unique name within the schema (e.g., "min-wall-length"). */
-  readonly name: string
-  /** Human + AI readable explanation of what this constraint enforces. */
-  readonly description: string
-  /**
-   * Evaluation priority. Higher numbers win when two constraints conflict.
-   * Default: 0.
-   */
-  readonly priority: number
-  /**
-   * Scope of this constraint.
-   * - **local** — governs relationships between specific entities.
-   * - **global** — enforces a world-level invariant (always re-evaluated).
-   */
-  readonly scope: "local" | "global"
-  /** What the engine does when this constraint is violated. */
-  readonly effect: ConstraintEffect
-  /**
-   * What triggers re-evaluation. Omit to re-evaluate on every intent
-   * (correct but slower). Provide for targeted evaluation.
-   */
-  readonly watch?: ConstraintWatch
-  /**
-   * Evaluate the constraint against the current world state + triggering intent.
-   *
-   * Called BEFORE the intent executes so the full entity graph is visible.
-   * Must be pure — read-only access only. Return a ConstraintResult.
-   */
-  readonly evaluate: (ctx: ConstraintContext) => ConstraintResult
+    /** Unique name within the schema (e.g., "min-wall-length"). */
+    readonly name: string
+    /** Human + AI readable explanation of what this constraint enforces. */
+    readonly description: string
+    /**
+     * Evaluation priority. Higher numbers win when two constraints conflict.
+     * Default: 0.
+     */
+    readonly priority: number
+    /**
+     * Scope of this constraint.
+     * - **local** — governs relationships between specific entities.
+     * - **global** — enforces a world-level invariant (always re-evaluated).
+     */
+    readonly scope: "local" | "global"
+    /** What the engine does when this constraint is violated. */
+    readonly effect: ConstraintEffect
+    /**
+     * What triggers re-evaluation. Omit to re-evaluate on every intent
+     * (correct but slower). Provide for targeted evaluation.
+     */
+    readonly watch?: ConstraintWatch
+    /**
+     * Evaluate the constraint against the current world state + triggering intent.
+     *
+     * Called BEFORE the intent executes so the full entity graph is visible.
+     * Must be pure — read-only access only. Return a ConstraintResult.
+     */
+    readonly evaluate: (ctx: ConstraintContext) => ConstraintResult
 }
 
 // ── defineConstraint ─────────────────────────────────────────────
@@ -161,13 +194,13 @@ export interface ConstraintDefinition {
  * ```
  */
 export function defineConstraint(config: ConstraintDefinition): ConstraintDefinition {
-  if (config.name.trim().length === 0) {
-    throw new Error("ConstraintDefinition.name must not be empty")
-  }
-  if (config.description.trim().length === 0) {
-    throw new Error(
-      `ConstraintDefinition "${config.name}": description must not be empty`,
-    )
-  }
-  return config
+    if (config.name.trim().length === 0) {
+        throw new Error("ConstraintDefinition.name must not be empty")
+    }
+    if (config.description.trim().length === 0) {
+        throw new Error(
+            `ConstraintDefinition "${config.name}": description must not be empty`,
+        )
+    }
+    return config
 }

@@ -2,7 +2,8 @@ import { type Intent, type IntentInput } from "../intent/intent.js"
 import { type WorldQuery } from "../world/world.js"
 import { type EntityStore } from "../entity/entity-store.js"
 import { type ConstraintGraph } from "./constraint-graph.js"
-import { type Violation } from "./constraint-definition.js"
+import { type Violation, type WorldReadonlyView } from "./constraint-definition.js"
+import { type Entity } from "../entity/entity.js"
 
 // ── SolverResult ─────────────────────────────────────────────────
 
@@ -10,21 +11,21 @@ import { type Violation } from "./constraint-definition.js"
  * The result of running the ConstraintSolver for one intent dispatch.
  */
 export interface SolverResult {
-  /**
-   * True if any "prevent" constraint was violated.
-   * When true, the intent must not execute.
-   */
-  readonly hasPreventViolations: boolean
-  /**
-   * All violations gathered across every evaluated constraint.
-   * Includes prevent, warn, adjust, and enforce violations.
-   */
-  readonly violations: readonly Violation[]
-  /**
-   * Fix intents suggested by "adjust"/"enforce" constraints.
-   * Dispatched as system intents after the main intent executes.
-   */
-  readonly adjustments: readonly IntentInput[]
+    /**
+     * True if any "prevent" constraint was violated.
+     * When true, the intent must not execute.
+     */
+    readonly hasPreventViolations: boolean
+    /**
+     * All violations gathered across every evaluated constraint.
+     * Includes prevent, warn, adjust, and enforce violations.
+     */
+    readonly violations: readonly Violation[]
+    /**
+     * Fix intents suggested by "adjust"/"enforce" constraints.
+     * Dispatched as system intents after the main intent executes.
+     */
+    readonly adjustments: readonly IntentInput[]
 }
 
 // ── ConstraintSolver ─────────────────────────────────────────────
@@ -44,79 +45,81 @@ export interface SolverResult {
  * to proceed, and for dispatching any adjustments.
  */
 export class ConstraintSolver {
-  constructor(private readonly graph: ConstraintGraph) {}
+    constructor(private readonly graph: ConstraintGraph) {}
 
-  /**
-   * Run all relevant constraints for the given pending intent.
-   *
-   * @param intent — The validated intent about to be executed.
-   * @param query — Read-only world query (current state, pre-execution).
-   * @param entities — Entity store for type lookups.
-   */
-  solve(intent: Intent, query: WorldQuery, entities: EntityStore): SolverResult {
-    const affectedEntityIds = extractAffectedEntityIds(intent)
-    const affectedEntityTypes = extractAffectedEntityTypes(
-      intent,
-      affectedEntityIds,
-      entities,
-    )
-    const affectedTraitNames = extractAffectedTraitNames(intent)
+    /**
+     * Run all relevant constraints for the given pending intent.
+     *
+     * @param intent — The validated intent about to be executed.
+     * @param query — Read-only world query (current state, pre-execution).
+     * @param entities — Entity store for type lookups.
+     */
+    solve(intent: Intent, query: WorldQuery, entities: EntityStore): SolverResult {
+        const affectedEntityIds = extractAffectedEntityIds(intent)
+        const affectedEntityTypes = extractAffectedEntityTypes(
+            intent,
+            affectedEntityIds,
+            entities,
+        )
+        const affectedTraitNames = extractAffectedTraitNames(intent)
 
-    const relevant = this.graph.getRelevant(
-      intent,
-      affectedEntityTypes,
-      affectedTraitNames,
-    )
+        const relevant = this.graph.getRelevant(
+            intent,
+            affectedEntityTypes,
+            affectedTraitNames,
+        )
 
-    const violations: Violation[] = []
-    const adjustments: IntentInput[] = []
-    let hasPreventViolations = false
+        const violations: Violation[] = []
+        const adjustments: IntentInput[] = []
+        let hasPreventViolations = false
 
-    const ctx = {
-      entities: query,
-      trigger: { intent, affectedEntityIds },
+        const worldView = buildWorldReadonlyView(entities)
+        const ctx = {
+            entities: query,
+            world: worldView,
+            trigger: { intent, affectedEntityIds },
+        }
+
+        for (const constraint of relevant) {
+            let result
+            try {
+                result = constraint.evaluate(ctx)
+            } catch (err) {
+                // Constraint threw — treat as a warn violation (don't crash dispatch)
+                violations.push({
+                    constraintName: constraint.name,
+                    message: `Constraint "${constraint.name}" threw during evaluation: ${String(err)}`,
+                    entityIds: [...affectedEntityIds],
+                    effect: "warn",
+                })
+                continue
+            }
+
+            if (!result.valid) {
+                for (const v of result.violations) {
+                    violations.push({ ...v, effect: constraint.effect })
+                }
+
+                if (constraint.effect === "prevent") {
+                    hasPreventViolations = true
+                    // Continue evaluating — gather all prevent violations for richer error info
+                }
+            }
+
+            // Collect adjustments regardless of valid/invalid
+            // (an "adjust" constraint may want to snap even when technically valid)
+            if (
+                (constraint.effect === "adjust" || constraint.effect === "enforce") &&
+                result.suggestions
+            ) {
+                for (const suggestion of result.suggestions) {
+                    adjustments.push(suggestion)
+                }
+            }
+        }
+
+        return { hasPreventViolations, violations, adjustments }
     }
-
-    for (const constraint of relevant) {
-      let result
-      try {
-        result = constraint.evaluate(ctx)
-      } catch (err) {
-        // Constraint threw — treat as a warn violation (don't crash dispatch)
-        violations.push({
-          constraintName: constraint.name,
-          message: `Constraint "${constraint.name}" threw during evaluation: ${String(err)}`,
-          entityIds: [...affectedEntityIds],
-          effect: "warn",
-        })
-        continue
-      }
-
-      if (!result.valid) {
-        for (const v of result.violations) {
-          violations.push({ ...v, effect: constraint.effect })
-        }
-
-        if (constraint.effect === "prevent") {
-          hasPreventViolations = true
-          // Continue evaluating — gather all prevent violations for richer error info
-        }
-      }
-
-      // Collect adjustments regardless of valid/invalid
-      // (an "adjust" constraint may want to snap even when technically valid)
-      if (
-        (constraint.effect === "adjust" || constraint.effect === "enforce") &&
-        result.suggestions
-      ) {
-        for (const suggestion of result.suggestions) {
-          adjustments.push(suggestion)
-        }
-      }
-    }
-
-    return { hasPreventViolations, violations, adjustments }
-  }
 }
 
 // ── Intent-to-affected-entities helpers ──────────────────────────
@@ -126,23 +129,23 @@ export class ConstraintSolver {
  * Works on the intent params — no entity store access needed.
  */
 export function extractAffectedEntityIds(intent: Intent): readonly string[] {
-  const p = intent.params
-  switch (intent.type) {
-    case "entity.create":
-      // ID may be specified; auto-generated IDs aren't in params yet
-      return typeof p["id"] === "string" ? [p["id"]] : []
-    case "entity.delete":
-      return typeof p["id"] === "string" ? [p["id"]] : []
-    case "trait.update":
-    case "trait.remove":
-      return typeof p["entityId"] === "string" ? [p["entityId"]] : []
-    case "entity.reparent":
-      return typeof p["entityId"] === "string" ? [p["entityId"]] : []
-    case "_entity.restoreSnapshot":
-      return typeof p["rootId"] === "string" ? [p["rootId"]] : []
-    default:
-      return []
-  }
+    const p = intent.params
+    switch (intent.type) {
+        case "entity.create":
+            // ID may be specified; auto-generated IDs aren't in params yet
+            return typeof p["id"] === "string" ? [p["id"]] : []
+        case "entity.delete":
+            return typeof p["id"] === "string" ? [p["id"]] : []
+        case "trait.update":
+        case "trait.remove":
+            return typeof p["entityId"] === "string" ? [p["entityId"]] : []
+        case "entity.reparent":
+            return typeof p["entityId"] === "string" ? [p["entityId"]] : []
+        case "_entity.restoreSnapshot":
+            return typeof p["rootId"] === "string" ? [p["rootId"]] : []
+        default:
+            return []
+    }
 }
 
 /**
@@ -151,29 +154,29 @@ export function extractAffectedEntityIds(intent: Intent): readonly string[] {
  * Falls back to intent params for entity.create.
  */
 function extractAffectedEntityTypes(
-  intent: Intent,
-  affectedEntityIds: readonly string[],
-  entities: EntityStore,
+    intent: Intent,
+    affectedEntityIds: readonly string[],
+    entities: EntityStore,
 ): readonly string[] {
-  const types = new Set<string>()
+    const types = new Set<string>()
 
-  // entity.create provides type in params, entity doesn't exist in store yet
-  if (intent.type === "entity.create") {
-    const entityType = intent.params["entityType"]
-    if (typeof entityType === "string") {
-      types.add(entityType)
+    // entity.create provides type in params, entity doesn't exist in store yet
+    if (intent.type === "entity.create") {
+        const entityType = intent.params["entityType"]
+        if (typeof entityType === "string") {
+            types.add(entityType)
+        }
     }
-  }
 
-  // For all other intents, look up from store
-  for (const id of affectedEntityIds) {
-    const entity = entities.get(id)
-    if (entity !== undefined) {
-      types.add(entity.type)
+    // For all other intents, look up from store
+    for (const id of affectedEntityIds) {
+        const entity = entities.get(id)
+        if (entity !== undefined) {
+            types.add(entity.type)
+        }
     }
-  }
 
-  return [...types]
+    return [...types]
 }
 
 /**
@@ -181,11 +184,39 @@ function extractAffectedEntityTypes(
  * Only trait.update and trait.remove modify specific traits.
  */
 function extractAffectedTraitNames(intent: Intent): readonly string[] {
-  if (intent.type === "trait.update" || intent.type === "trait.remove") {
-    const traitName = intent.params["traitName"]
-    if (typeof traitName === "string") {
-      return [traitName]
+    if (intent.type === "trait.update" || intent.type === "trait.remove") {
+        const traitName = intent.params["traitName"]
+        if (typeof traitName === "string") {
+            return [traitName]
+        }
     }
-  }
-  return []
+    return []
+}
+
+// ── WorldReadonlyView implementation ─────────────────────────────
+
+/**
+ * Build a WorldReadonlyView backed by an EntityStore.
+ * This is passed to constraint evaluate functions as ctx.world.
+ */
+function buildWorldReadonlyView(entities: EntityStore): WorldReadonlyView {
+    return {
+        getEntity(id: string): Entity | undefined {
+            return entities.get(id)
+        },
+
+        getParent(id: string): Entity | undefined {
+            const entity = entities.get(id)
+            if (!entity?.parent) return undefined
+            return entities.get(entity.parent)
+        },
+
+        getChildren(id: string): readonly Entity[] {
+            return entities.getChildren(id)
+        },
+
+        getTrait(id: string, traitName: string): unknown {
+            return entities.getTrait(id, traitName)
+        },
+    }
 }

@@ -32,17 +32,17 @@ Every exported function and class should be typed with explicit return types. Us
 ```typescript
 // Good: Zod schema is the source of truth
 const SpatialSchema = z.object({
-  position: Vec3Schema,
-  rotation: QuatSchema,
-  scale: Vec3Schema,
+    position: Vec3Schema,
+    rotation: QuatSchema,
+    scale: Vec3Schema,
 })
 type SpatialData = z.infer<typeof SpatialSchema>
 
 // Bad: separate interface that might drift from validation
 interface SpatialData {
-  position: Vec3
-  rotation: Quat
-  scale: Vec3
+    position: Vec3
+    rotation: Quat
+    scale: Vec3
 }
 ```
 

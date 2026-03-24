@@ -36,11 +36,11 @@ The pure TypeScript kernel. Zero framework deps. Exports:
 ```typescript
 // Schema authoring
 export {
-  defineSchema,
-  defineTrait,
-  defineEntityType,
-  defineConstraint,
-  defineSystem,
+    defineSchema,
+    defineTrait,
+    defineEntityType,
+    defineConstraint,
+    defineSystem,
 } from "./schema"
 
 // Runtime
@@ -50,11 +50,11 @@ export { type Intent, type IntentResult } from "./intent"
 
 // Built-in traits
 export {
-  Spatial,
-  Renderable,
-  Connectable,
-  Editable,
-  Metadata,
+    Spatial,
+    Renderable,
+    Connectable,
+    Editable,
+    Metadata,
 } from "./trait/built-in-traits"
 
 // Agent interface generation
@@ -62,13 +62,13 @@ export { generateToolDefinitions, generateGlossary } from "./agent"
 
 // Types for Schema authors
 export type {
-  DomainSchema,
-  TraitDefinition,
-  EntityTypeDefinition,
-  ConstraintDefinition,
-  SystemDefinition,
-  ConstraintContext,
-  ConstraintResult,
+    DomainSchema,
+    TraitDefinition,
+    EntityTypeDefinition,
+    ConstraintDefinition,
+    SystemDefinition,
+    ConstraintContext,
+    ConstraintResult,
 } from "./types"
 ```
 
@@ -94,11 +94,11 @@ export { Viewport2D } from "./viewports/Viewport2D"
 
 // Hooks
 export {
-  useWorld,
-  useSelection,
-  useIntent,
-  useEntities,
-  useConstraintViolations,
+    useWorld,
+    useSelection,
+    useIntent,
+    useEntities,
+    useConstraintViolations,
 } from "./hooks"
 
 // Zustand bridge
@@ -116,21 +116,21 @@ import homescapeSchema from "./schema"
 const world = World.create(homescapeSchema)
 
 export default function App() {
-  return <BixEditor world={world} schema={homescapeSchema} />
+    return <BixEditor world={world} schema={homescapeSchema} />
 }
 
 // Custom: build your own layout
 import { Viewport3D, Palette, Inspector, useWorld } from "@bix/editor"
 
 export default function CustomEditor() {
-  const world = useWorld()
-  return (
-    <div className="flex">
-      <Palette schema={schema} />
-      <Viewport3D world={world} />
-      <Inspector />
-    </div>
-  )
+    const world = useWorld()
+    return (
+        <div className="flex">
+            <Palette schema={schema} />
+            <Viewport3D world={world} />
+            <Inspector />
+        </div>
+    )
 }
 ```
 

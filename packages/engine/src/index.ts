@@ -41,34 +41,43 @@ export type { Entity } from "./entity/entity.js"
 
 export type { Intent, IntentInput, IntentResult, IntentSource } from "./intent/intent.js"
 
-export type { DomainSchema, EntityTypeDefinition } from "./schema/schema.js"
+export type {
+    DomainSchema,
+    EntityTypeDefinition,
+    PaletteConfig,
+    PaletteCategory,
+    ViewportConfig,
+    ViewportType,
+    ViewportRenderer,
+} from "./schema/schema.js"
 
 export type {
-  TraitDefinition,
-  EditableConfig,
-  EditableFieldConfig,
+    TraitDefinition,
+    EditableConfig,
+    EditableFieldConfig,
 } from "./trait/trait-definition.js"
 
 export type {
-  ConstraintDefinition,
-  ConstraintContext,
-  ConstraintResult,
-  ConstraintEffect,
-  ConstraintWatch,
-  Violation,
+    ConstraintDefinition,
+    ConstraintContext,
+    ConstraintResult,
+    ConstraintEffect,
+    ConstraintWatch,
+    Violation,
+    WorldReadonlyView,
 } from "./constraint/constraint-definition.js"
 
 export type {
-  SystemDefinition,
-  SystemPhase,
-  SystemWorldView,
+    SystemDefinition,
+    SystemPhase,
+    SystemWorldView,
 } from "./system/system-definition.js"
 
 export type {
-  WorldEvent,
-  WorldSnapshot,
-  EntitySnapshot,
-  WorldEventHandler,
+    WorldEvent,
+    WorldSnapshot,
+    EntitySnapshot,
+    WorldEventHandler,
 } from "./world/world.js"
 
 // ── Built-in traits ──────────────────────────────────────────────
@@ -76,29 +85,29 @@ export type {
 // Import these to attach built-in traits in entity type definitions.
 
 export {
-  SpatialTrait,
-  RenderableTrait,
-  ConnectableTrait,
-  EditableTrait,
-  MetadataTrait,
-  BUILT_IN_TRAITS,
-  BUILT_IN_TRAIT_NAMES,
-  // Geometry schemas (useful for authoring domain traits with Vec3/Quat fields)
-  Vec3Schema,
-  QuatSchema,
-  SnapPointSchema,
+    SpatialTrait,
+    RenderableTrait,
+    ConnectableTrait,
+    EditableTrait,
+    MetadataTrait,
+    BUILT_IN_TRAITS,
+    BUILT_IN_TRAIT_NAMES,
+    // Geometry schemas (useful for authoring domain traits with Vec3/Quat fields)
+    Vec3Schema,
+    QuatSchema,
+    SnapPointSchema,
 } from "./trait/built-in-traits.js"
 
 export type {
-  Vec3,
-  Quat,
-  SpatialData,
-  RenderableData,
-  ConnectableData,
-  SnapPoint,
-  Connection,
-  EditableData,
-  MetadataData,
+    Vec3,
+    Quat,
+    SpatialData,
+    RenderableData,
+    ConnectableData,
+    SnapPoint,
+    Connection,
+    EditableData,
+    MetadataData,
 } from "./trait/built-in-traits.js"
 
 // ── Phase ordering ────────────────────────────────────────────────

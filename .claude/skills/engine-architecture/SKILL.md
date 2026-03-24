@@ -18,12 +18,12 @@ Entities compose hierarchically — a "house" entity contains wall/door/roof chi
 
 ```typescript
 interface Entity {
-  id: string // nanoid
-  type: string // from Schema: "wall", "asteroid", "neuron"
-  traits: Map<string, TraitInstance>
-  children: string[] // child entity IDs
-  parent: string | null // parent entity ID
-  metadata: Record<string, unknown>
+    id: string // nanoid
+    type: string // from Schema: "wall", "asteroid", "neuron"
+    traits: Map<string, TraitInstance>
+    children: string[] // child entity IDs
+    parent: string | null // parent entity ID
+    metadata: Record<string, unknown>
 }
 ```
 
@@ -43,28 +43,28 @@ Domain Traits are defined in the Schema (e.g. `Structural`, `Orbital`, `Activati
 
 ```typescript
 interface TraitDefinition {
-  name: string
-  schema: z.ZodType // Zod schema — validates AND generates types
-  defaults: Record<string, unknown>
-  editable?: {
-    fields: Record<
-      string,
-      {
-        label: string
-        widget: "slider" | "input" | "dropdown" | "color" | "toggle" | "vec3"
-        min?: number
-        max?: number
-        step?: number
-        options?: string[]
-      }
-    >
-  }
+    name: string
+    schema: z.ZodType // Zod schema — validates AND generates types
+    defaults: Record<string, unknown>
+    editable?: {
+        fields: Record<
+            string,
+            {
+                label: string
+                widget: "slider" | "input" | "dropdown" | "color" | "toggle" | "vec3"
+                min?: number
+                max?: number
+                step?: number
+                options?: string[]
+            }
+        >
+    }
 }
 
 // Runtime instance
 interface TraitInstance {
-  definition: string // name of the TraitDefinition
-  data: Record<string, unknown> // validated against definition.schema
+    definition: string // name of the TraitDefinition
+    data: Record<string, unknown> // validated against definition.schema
 }
 ```
 
@@ -82,27 +82,27 @@ Key properties:
 
 ```typescript
 interface ConstraintDefinition {
-  name: string
-  description: string // human + AI readable
-  priority: number // higher = stronger
-  scope: "local" | "global" // local = between entities, global = world invariant
+    name: string
+    description: string // human + AI readable
+    priority: number // higher = stronger
+    scope: "local" | "global" // local = between entities, global = world invariant
 
-  // The condition function receives the full world context
-  // Return: { valid: boolean, violations: Violation[], suggestions?: Intent[] }
-  evaluate: (ctx: ConstraintContext) => ConstraintResult
+    // The condition function receives the full world context
+    // Return: { valid: boolean, violations: Violation[], suggestions?: Intent[] }
+    evaluate: (ctx: ConstraintContext) => ConstraintResult
 
-  // What happens on violation
-  effect: "prevent" | "warn" | "adjust" | "enforce"
+    // What happens on violation
+    effect: "prevent" | "warn" | "adjust" | "enforce"
 }
 
 interface ConstraintContext {
-  entities: EntityQuery // query entities by type, trait, relationship
-  world: WorldReadonly // full world state (read-only)
-  trigger: {
-    // what caused re-evaluation
-    intent: Intent
-    affected: string[] // entity IDs touched
-  }
+    entities: EntityQuery // query entities by type, trait, relationship
+    world: WorldReadonly // full world state (read-only)
+    trigger: {
+        // what caused re-evaluation
+        intent: Intent
+        affected: string[] // entity IDs touched
+    }
 }
 ```
 
@@ -119,11 +119,11 @@ Function that runs on tick/frame/event, operating on entities matching a Trait s
 
 ```typescript
 interface SystemDefinition {
-  name: string
-  requiredTraits: string[] // only processes entities with ALL these
-  phase: "pre-physics" | "physics" | "post-physics" | "constraints" | "render-prep"
-  priority: number // order within phase
-  update: (entities: Entity[], world: World, dt: number) => Intent[]
+    name: string
+    requiredTraits: string[] // only processes entities with ALL these
+    phase: "pre-physics" | "physics" | "post-physics" | "constraints" | "render-prep"
+    priority: number // order within phase
+    update: (entities: Entity[], world: World, dt: number) => Intent[]
 }
 ```
 
@@ -140,30 +140,30 @@ THE MOST IMPORTANT ABSTRACTION. A Schema turns bix.bot into a specific applicati
 
 ```typescript
 interface DomainSchema {
-  name: string // "homescape", "asteroid-sim"
-  version: string
-  description: string // human + AI readable
+    name: string // "homescape", "asteroid-sim"
+    version: string
+    description: string // human + AI readable
 
-  traits: TraitDefinition[] // domain-specific traits
-  entityTypes: EntityTypeDefinition[] // what entities exist + which traits they carry
-  constraints: ConstraintDefinition[] // all domain rules
-  systems: SystemDefinition[] // domain simulation logic
+    traits: TraitDefinition[] // domain-specific traits
+    entityTypes: EntityTypeDefinition[] // what entities exist + which traits they carry
+    constraints: ConstraintDefinition[] // all domain rules
+    systems: SystemDefinition[] // domain simulation logic
 
-  palette: PaletteConfig // what appears in the editor palette
-  viewports: ViewportConfig[] // 2D, 3D, graph, etc.
+    palette: PaletteConfig // what appears in the editor palette
+    viewports: ViewportConfig[] // 2D, 3D, graph, etc.
 
-  // Auto-derived but overridable:
-  intents?: IntentCatalog // what actions are possible
-  agentGlossary?: Record<string, string> // domain term definitions for LLMs
+    // Auto-derived but overridable:
+    intents?: IntentCatalog // what actions are possible
+    agentGlossary?: Record<string, string> // domain term definitions for LLMs
 }
 
 interface EntityTypeDefinition {
-  type: string // "wall", "asteroid", "neuron"
-  label: string // human display name
-  description: string // for AI + tooltips
-  traits: string[] // trait names this type carries
-  icon?: string // lucide icon name for palette
-  defaults?: Record<string, Record<string, unknown>> // per-trait default overrides
+    type: string // "wall", "asteroid", "neuron"
+    label: string // human display name
+    description: string // for AI + tooltips
+    traits: string[] // trait names this type carries
+    icon?: string // lucide icon name for palette
+    defaults?: Record<string, Record<string, unknown>> // per-trait default overrides
 }
 ```
 
@@ -185,27 +185,27 @@ Responsibilities:
 
 ```typescript
 class World {
-  // State
-  private entities: EntityStore
-  private constraintGraph: ConstraintGraph
-  private spatialIndex: SpatialIndex
-  private intentHistory: IntentStack
+    // State
+    private entities: EntityStore
+    private constraintGraph: ConstraintGraph
+    private spatialIndex: SpatialIndex
+    private intentHistory: IntentStack
 
-  // Schema
-  private schema: DomainSchema
+    // Schema
+    private schema: DomainSchema
 
-  // Subscriptions
-  private subscribers: Set<(event: WorldEvent) => void>
+    // Subscriptions
+    private subscribers: Set<(event: WorldEvent) => void>
 
-  // Core API
-  dispatch(intent: Intent): IntentResult // validate + execute + constrain
-  query(q: EntityQuery): Entity[] // read-only queries
-  undo(): void
-  redo(): void
-  serialize(): WorldSnapshot
-  static deserialize(snap: WorldSnapshot, schema: DomainSchema): World
-  subscribe(fn: (event: WorldEvent) => void): () => void
-  tick(dt: number): void // run all systems
+    // Core API
+    dispatch(intent: Intent): IntentResult // validate + execute + constrain
+    query(q: EntityQuery): Entity[] // read-only queries
+    undo(): void
+    redo(): void
+    serialize(): WorldSnapshot
+    static deserialize(snap: WorldSnapshot, schema: DomainSchema): World
+    subscribe(fn: (event: WorldEvent) => void): () => void
+    tick(dt: number): void // run all systems
 }
 ```
 
@@ -224,13 +224,13 @@ Serializable description of a desired state change. The uniform mutation interfa
 
 ```typescript
 interface Intent {
-  type: string // "entity.create", "entity.delete", "trait.update", etc.
-  params: Record<string, unknown> // validated by Zod per intent type
-  source: "user" | "agent" | "system"
-  timestamp: number
-  // Added by World after execution:
-  id?: string // for undo reference
-  inverse?: Intent // auto-generated for undo
+    type: string // "entity.create", "entity.delete", "trait.update", etc.
+    params: Record<string, unknown> // validated by Zod per intent type
+    source: "user" | "agent" | "system"
+    timestamp: number
+    // Added by World after execution:
+    id?: string // for undo reference
+    inverse?: Intent // auto-generated for undo
 }
 ```
 

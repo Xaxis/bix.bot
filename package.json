@@ -1,22 +1,22 @@
 {
-  "name": "bix.bot",
-  "private": true,
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
-  "packageManager": "yarn@1.22.22",
-  "scripts": {
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "typecheck": "turbo run typecheck",
-    "dev": "turbo run dev",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
-  },
-  "devDependencies": {
-    "prettier": "^3.4.0",
-    "turbo": "^2.4.0",
-    "typescript": "^5.7.0"
-  }
+    "name": "bix.bot",
+    "private": true,
+    "workspaces": [
+        "packages/*",
+        "apps/*"
+    ],
+    "packageManager": "yarn@1.22.22",
+    "scripts": {
+        "build": "turbo run build",
+        "test": "turbo run test",
+        "typecheck": "turbo run typecheck",
+        "dev": "yarn workspace @bix/bix-editor dev",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "devDependencies": {
+        "prettier": "^3.4.0",
+        "turbo": "^2.4.0",
+        "typescript": "^5.7.0"
+    }
 }

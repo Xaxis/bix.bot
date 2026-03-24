@@ -1,9 +1,9 @@
 import {
-  type Entity,
-  type IntentInput,
-  type IntentResult,
-  type Violation,
-  type World,
+    type Entity,
+    type IntentInput,
+    type IntentResult,
+    type Violation,
+    type World,
 } from "@bix/engine"
 import { type WorldStoreState } from "../stores/world-store.js"
 import { useWorldContext } from "./world-context.js"
@@ -17,7 +17,7 @@ import { useWorldContext } from "./world-context.js"
  * For reactive state that updates with the World, prefer the other hooks.
  */
 export function useWorld(): World {
-  return useWorldContext().world
+    return useWorldContext().world
 }
 
 // ── useWorldStore ─────────────────────────────────────────────────
@@ -32,7 +32,7 @@ export function useWorld(): World {
  * ```
  */
 export function useWorldStore<T>(selector: (state: WorldStoreState) => T): T {
-  return useWorldContext().store(selector)
+    return useWorldContext().store(selector)
 }
 
 // ── useSelection ──────────────────────────────────────────────────
@@ -45,29 +45,29 @@ export function useWorldStore<T>(selector: (state: WorldStoreState) => T): T {
  * ```
  */
 export function useSelection(): {
-  selection: ReadonlySet<string>
-  setSelection: (ids: readonly string[]) => void
-  addToSelection: (id: string) => void
-  removeFromSelection: (id: string) => void
-  clearSelection: () => void
-  toggleSelection: (id: string) => void
+    selection: ReadonlySet<string>
+    setSelection: (ids: readonly string[]) => void
+    addToSelection: (id: string) => void
+    removeFromSelection: (id: string) => void
+    clearSelection: () => void
+    toggleSelection: (id: string) => void
 } {
-  const { store } = useWorldContext()
-  const selection = store((s) => s.selection)
-  const setSelection = store((s) => s.setSelection)
-  const addToSelection = store((s) => s.addToSelection)
-  const removeFromSelection = store((s) => s.removeFromSelection)
-  const clearSelection = store((s) => s.clearSelection)
-  const toggleSelection = store((s) => s.toggleSelection)
+    const { store } = useWorldContext()
+    const selection = store((s) => s.selection)
+    const setSelection = store((s) => s.setSelection)
+    const addToSelection = store((s) => s.addToSelection)
+    const removeFromSelection = store((s) => s.removeFromSelection)
+    const clearSelection = store((s) => s.clearSelection)
+    const toggleSelection = store((s) => s.toggleSelection)
 
-  return {
-    selection,
-    setSelection,
-    addToSelection,
-    removeFromSelection,
-    clearSelection,
-    toggleSelection,
-  }
+    return {
+        selection,
+        setSelection,
+        addToSelection,
+        removeFromSelection,
+        clearSelection,
+        toggleSelection,
+    }
 }
 
 // ── useIntent ─────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ export function useSelection(): {
  * ```
  */
 export function useIntent(): (input: IntentInput) => IntentResult {
-  return useWorldContext().store((s) => s.dispatch)
+    return useWorldContext().store((s) => s.dispatch)
 }
 
 // ── useEntities ───────────────────────────────────────────────────
@@ -95,8 +95,8 @@ export function useIntent(): (input: IntentInput) => IntentResult {
  * ```
  */
 export function useEntities(filter?: (entity: Entity) => boolean): readonly Entity[] {
-  const entities = useWorldContext().store((s) => s.entities)
-  return filter !== undefined ? entities.filter(filter) : entities
+    const entities = useWorldContext().store((s) => s.entities)
+    return filter !== undefined ? entities.filter(filter) : entities
 }
 
 // ── useConstraintViolations ───────────────────────────────────────
@@ -113,5 +113,5 @@ export function useEntities(filter?: (entity: Entity) => boolean): readonly Enti
  * ```
  */
 export function useConstraintViolations(): readonly Violation[] {
-  return useWorldContext().store((s) => s.lastViolations)
+    return useWorldContext().store((s) => s.lastViolations)
 }

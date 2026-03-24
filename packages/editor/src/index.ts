@@ -32,9 +32,9 @@
 export { createWorldStore } from "./stores/world-store.js"
 
 export type {
-  WorldStoreState,
-  WorldStoreHandle,
-  ActiveTool,
+    WorldStoreState,
+    WorldStoreHandle,
+    ActiveTool,
 } from "./stores/world-store.js"
 
 // ── React context + hooks ─────────────────────────────────────────
@@ -44,12 +44,12 @@ export { WorldStoreProvider } from "./hooks/world-context.js"
 export type { WorldStoreProviderProps } from "./hooks/world-context.js"
 
 export {
-  useWorld,
-  useWorldStore,
-  useSelection,
-  useIntent,
-  useEntities,
-  useConstraintViolations,
+    useWorld,
+    useWorldStore,
+    useSelection,
+    useIntent,
+    useEntities,
+    useConstraintViolations,
 } from "./hooks/hooks.js"
 
 // ── Components ────────────────────────────────────────────────────

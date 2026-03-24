@@ -6,8 +6,8 @@ import { createWorldStore, type WorldStoreState } from "../stores/world-store.js
 // ── Context ───────────────────────────────────────────────────────
 
 interface WorldContextValue {
-  world: World
-  store: UseBoundStore<StoreApi<WorldStoreState>>
+    world: World
+    store: UseBoundStore<StoreApi<WorldStoreState>>
 }
 
 const WorldContext = createContext<WorldContextValue | null>(null)
@@ -15,8 +15,8 @@ const WorldContext = createContext<WorldContextValue | null>(null)
 // ── Provider ──────────────────────────────────────────────────────
 
 export interface WorldStoreProviderProps {
-  world: World
-  children: React.ReactNode
+    world: World
+    children: React.ReactNode
 }
 
 /**
@@ -36,15 +36,15 @@ export interface WorldStoreProviderProps {
  * ```
  */
 export function WorldStoreProvider({
-  world,
-  children,
+    world,
+    children,
 }: WorldStoreProviderProps): JSX.Element {
-  const { store, destroy } = useMemo(() => createWorldStore(world), [world])
-  useEffect(() => destroy, [destroy])
+    const { store, destroy } = useMemo(() => createWorldStore(world), [world])
+    useEffect(() => destroy, [destroy])
 
-  const value = useMemo(() => ({ world, store }), [world, store])
+    const value = useMemo(() => ({ world, store }), [world, store])
 
-  return <WorldContext.Provider value={value}>{children}</WorldContext.Provider>
+    return <WorldContext.Provider value={value}>{children}</WorldContext.Provider>
 }
 
 // ── Context accessor ──────────────────────────────────────────────
@@ -54,12 +54,12 @@ export function WorldStoreProvider({
  * Use the typed convenience hooks instead (useWorld, useWorldStore, etc.).
  */
 export function useWorldContext(): WorldContextValue {
-  const ctx = useContext(WorldContext)
-  if (ctx === null) {
-    throw new Error(
-      "useWorldContext must be used inside a <WorldStoreProvider>. " +
-        "If you're using custom layout, wrap your components with WorldStoreProvider.",
-    )
-  }
-  return ctx
+    const ctx = useContext(WorldContext)
+    if (ctx === null) {
+        throw new Error(
+            "useWorldContext must be used inside a <WorldStoreProvider>. " +
+                "If you're using custom layout, wrap your components with WorldStoreProvider.",
+        )
+    }
+    return ctx
 }

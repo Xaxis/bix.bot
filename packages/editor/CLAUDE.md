@@ -25,16 +25,16 @@ NEVER duplicate World state into Zustand. Subscribe to the World and derive what
 ```typescript
 // Good: hook reads from World
 function useEntityTraits(entityId: string) {
-  const world = useWorld()
-  return useSyncExternalStore(
-    (cb) => world.subscribe(cb),
-    () => world.getEntity(entityId)?.traits,
-  )
+    const world = useWorld()
+    return useSyncExternalStore(
+        (cb) => world.subscribe(cb),
+        () => world.getEntity(entityId)?.traits,
+    )
 }
 
 // Bad: copying World state into Zustand
 const useStore = create((set) => ({
-  entities: [], // NO — this duplicates World state
+    entities: [], // NO — this duplicates World state
 }))
 ```
 

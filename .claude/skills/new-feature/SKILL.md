@@ -45,28 +45,28 @@ For engine features:
 ```typescript
 // Example test shape
 describe("MyNewFeature", () => {
-  let world: World
+    let world: World
 
-  beforeEach(() => {
-    world = World.create(testSchema)
-  })
-
-  it("should [expected behavior] when [action]", () => {
-    const result = world.dispatch({
-      type: "entity.create",
-      params: { type: "test-entity" },
-      source: "user",
-      timestamp: Date.now(),
+    beforeEach(() => {
+        world = World.create(testSchema)
     })
-    expect(result.success).toBe(true)
-    // Assert on world state
-  })
 
-  it("should undo cleanly", () => {
-    world.dispatch(/* ... */)
-    world.undo()
-    // Assert state matches pre-dispatch
-  })
+    it("should [expected behavior] when [action]", () => {
+        const result = world.dispatch({
+            type: "entity.create",
+            params: { type: "test-entity" },
+            source: "user",
+            timestamp: Date.now(),
+        })
+        expect(result.success).toBe(true)
+        // Assert on world state
+    })
+
+    it("should undo cleanly", () => {
+        world.dispatch(/* ... */)
+        world.undo()
+        // Assert state matches pre-dispatch
+    })
 })
 ```
 

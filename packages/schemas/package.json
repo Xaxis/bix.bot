@@ -1,6 +1,21 @@
 {
-  "name": "@bix/schemas",
-  "version": "0.0.1",
-  "private": true,
-  "type": "module"
+    "name": "@bix/schemas",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./homescape": "./homescape/index.ts"
+    },
+    "scripts": {
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "dependencies": {
+        "@bix/engine": "*",
+        "zod": "^3.24.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.7.0",
+        "vitest": "^3.0.0"
+    }
 }

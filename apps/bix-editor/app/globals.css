@@ -1,0 +1,235 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#__next {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Palette */
+.palette {
+    background: #111827;
+    color: #f9fafb;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    overflow-y: auto;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+}
+
+.palette-tools {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.palette-category-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+    padding: 6px 0 2px;
+}
+
+.palette button {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    background: #1f2937;
+    color: #e5e7eb;
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.palette button:hover {
+    background: #374151;
+    border-color: #4b5563;
+}
+
+.palette button[data-active="true"] {
+    background: #1d4ed8;
+    border-color: #3b82f6;
+    color: #fff;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #111827;
+    border-bottom: 1px solid #1f2937;
+}
+
+.toolbar button {
+    padding: 5px 14px;
+    border: 1px solid #374151;
+    border-radius: 5px;
+    background: #1f2937;
+    color: #e5e7eb;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+}
+
+.toolbar button:hover:not(:disabled) {
+    background: #374151;
+}
+
+.toolbar button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Inspector */
+.inspector {
+    background: #111827;
+    color: #f9fafb;
+    padding: 12px;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.inspector--empty {
+    color: #6b7280;
+    padding: 16px 12px;
+}
+
+.inspector-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #1f2937;
+}
+
+.inspector-type {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.inspector-trait {
+    margin-bottom: 12px;
+}
+
+.inspector-trait-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b7280;
+    margin: 0 0 6px;
+}
+
+.inspector-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 8px;
+}
+
+.inspector-field-label {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.inspector-field-input {
+    padding: 4px 8px;
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 4px;
+    color: #f3f4f6;
+    font-size: 13px;
+    width: 100%;
+}
+
+.inspector-field-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+/* BixEditor layout */
+.bix-editor {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    background: #0a0a0f;
+    color: #f9fafb;
+}
+
+/* Dark scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0d1117;
+}
+::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+}
+
+/* Inspector overrides for dark theme */
+.inspector {
+    background: transparent;
+}
+.inspector-field-input {
+    background: #0d1117;
+    border-color: #30363d;
+}
+.palette {
+    background: transparent;
+}
+.palette button {
+    background: #0d1117;
+    border-color: #30363d;
+    color: #c9d1d9;
+}
+.palette button:hover {
+    background: #161b22;
+}
+.palette button[data-active="true"] {
+    background: #1f6feb;
+    border-color: #388bfd;
+}
+.toolbar {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.toolbar button {
+    background: #21262d;
+    border-color: #30363d;
+    color: #c9d1d9;
+    font-size: 12px;
+}
+.toolbar button:hover:not(:disabled) {
+    background: #30363d;
+}

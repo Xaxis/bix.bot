@@ -39,11 +39,11 @@ Entities can be **composed** — an Entity can contain child Entities, forming h
 ```typescript
 // Conceptual shape — not prescriptive implementation
 interface Entity {
-  id: string
-  type: string // from Schema: "wall", "asteroid", "neuron"
-  traits: Map<string, Trait> // attached trait instances
-  children?: string[] // child entity IDs (composition)
-  parent?: string // parent entity ID
+    id: string
+    type: string // from Schema: "wall", "asteroid", "neuron"
+    traits: Map<string, Trait> // attached trait instances
+    children?: string[] // child entity IDs (composition)
+    parent?: string // parent entity ID
 }
 ```
 
@@ -68,10 +68,10 @@ Domain-specific Traits are defined in the Schema:
 ```typescript
 // Conceptual shape
 interface TraitDefinition {
-  name: string
-  schema: ZodSchema // Zod schema for validation + type generation
-  defaults: Record<string, any>
-  editable?: EditableConfig // UI generation hints
+    name: string
+    schema: ZodSchema // Zod schema for validation + type generation
+    defaults: Record<string, any>
+    editable?: EditableConfig // UI generation hints
 }
 ```
 
@@ -90,12 +90,12 @@ Constraints are:
 ```typescript
 // Conceptual shape
 interface ConstraintDefinition {
-  name: string
-  description: string // human + AI readable
-  condition: ConstraintExpr // declarative condition expression
-  effect: ConstraintEffect // what happens: enforce, prevent, warn, adjust
-  priority?: number
-  scope?: "local" | "global" // local = between specific entities, global = world-level invariant
+    name: string
+    description: string // human + AI readable
+    condition: ConstraintExpr // declarative condition expression
+    effect: ConstraintEffect // what happens: enforce, prevent, warn, adjust
+    priority?: number
+    scope?: "local" | "global" // local = between specific entities, global = world-level invariant
 }
 ```
 
@@ -114,11 +114,11 @@ A function that runs on a tick/frame/event, operating on all Entities matching a
 ```typescript
 // Conceptual shape
 interface SystemDefinition {
-  name: string
-  requiredTraits: string[] // only runs on entities with ALL these traits
-  phase: "physics" | "constraints" | "rendering" | "custom"
-  priority: number // execution order within phase
-  update: (entities: Entity[], world: World, dt: number) => Intent[]
+    name: string
+    requiredTraits: string[] // only runs on entities with ALL these traits
+    phase: "physics" | "constraints" | "rendering" | "custom"
+    priority: number // execution order within phase
+    update: (entities: Entity[], world: World, dt: number) => Intent[]
 }
 ```
 
@@ -153,21 +153,21 @@ A Schema defines:
 ```typescript
 // Conceptual shape
 interface DomainSchema {
-  name: string
-  version: string
-  description: string
+    name: string
+    version: string
+    description: string
 
-  traits: TraitDefinition[]
-  entityTypes: EntityTypeDefinition[]
-  constraints: ConstraintDefinition[]
-  systems: SystemDefinition[]
+    traits: TraitDefinition[]
+    entityTypes: EntityTypeDefinition[]
+    constraints: ConstraintDefinition[]
+    systems: SystemDefinition[]
 
-  palette: PaletteConfig
-  viewports: ViewportConfig[]
+    palette: PaletteConfig
+    viewports: ViewportConfig[]
 
-  // These are auto-derivable but overridable
-  intents?: IntentCatalog
-  agentGlossary?: AgentGlossary
+    // These are auto-derivable but overridable
+    intents?: IntentCatalog
+    agentGlossary?: AgentGlossary
 }
 ```
 
@@ -217,10 +217,10 @@ This is the uniform interface. When a human clicks "place wall" and an AI agent 
 ```typescript
 // Conceptual shape
 interface Intent {
-  type: string // "place", "delete", "update", "group", "ungroup", etc.
-  params: Record<string, any> // validated by Zod schema per intent type
-  source: "user" | "agent" | "system" // who emitted this
-  timestamp: number
+    type: string // "place", "delete", "update", "group", "ungroup", etc.
+    params: Record<string, any> // validated by Zod schema per intent type
+    source: "user" | "agent" | "system" // who emitted this
+    timestamp: number
 }
 ```
 
